@@ -635,6 +635,7 @@ class CloudBigIP(BigIP):
             pool: Name of pool to update
             data: BIG-IP config dict
         """
+        logger.debug("updating pool %s", pool)
         pool = self.get_pool(data['partition'], pool)
 
         def find_change(p, d):
@@ -652,6 +653,7 @@ class CloudBigIP(BigIP):
             return False
 
         if find_change(pool, data):
+            logger.debug("============================found chnage in pool %s", pool)
             pool.modify(**data)
             return True
 
@@ -665,6 +667,7 @@ class CloudBigIP(BigIP):
             pool: Name of pool
             member: Name of pool member
         """
+        logger.debug("get member func %s", pool)
         p = self.get_pool(partition, pool)
         m = p.members_s.members.load(name=urllib.quote(member),
                                      partition=partition)
@@ -678,6 +681,7 @@ class CloudBigIP(BigIP):
             pool: Name of pool
         """
         member_list = []
+        logger.debug("in pool member list func %s", pool)
         p = self.get_pool(partition, pool)
         members = p.members_s.get_collection()
         for member in members:
@@ -694,6 +698,7 @@ class CloudBigIP(BigIP):
             member: Name of pool member
             data: BIG-IP config dict
         """
+        logger.debug("member create function %s", pool)
         p = self.get_pool(partition, pool)
         member = p.members_s.members.create(
             name=member, partition=partition, **data)
@@ -1162,6 +1167,7 @@ class CloudBigIP(BigIP):
             data: Health Monitor dict
             old_protocol: Protocol health monitor currently uses
         """
+        logger.debug("monitor protocol function %s", pool)
         pool = self.get_pool(partition, name)
         pool.monitor = ''
         pool.update()
