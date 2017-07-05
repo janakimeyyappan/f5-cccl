@@ -582,7 +582,7 @@ class CloudBigIP(BigIP):
         for pool in pools:
             if pool.partition == partition and pool.name == name:
                 ret = pool
-                logger.debug("-------->>>>>>>>>>>>>-----pool name", pool.name)
+                logger.debug("-------->>>>>>>>>>>>>-----pool name %s", pool.name)
         return ret
         raise Exception("Failed to retrieve resource for pool {} "
                         "in partition {}".format(name, partition))
