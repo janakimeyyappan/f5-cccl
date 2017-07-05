@@ -578,9 +578,12 @@ class CloudBigIP(BigIP):
         # will return the first pool found even though there are multiple
         # choices (if iapps are used).  See issue #138.
         pools = self.ltm.pools.get_collection()
+        ret = None
         for pool in pools:
             if pool.partition == partition and pool.name == name:
-                return pool
+                ret = pool
+                logger.debug("-------->>>>>>>>>>>>>-----pool name", pool.name)
+        return ret
         raise Exception("Failed to retrieve resource for pool {} "
                         "in partition {}".format(name, partition))
 
