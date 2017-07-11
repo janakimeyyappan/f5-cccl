@@ -518,6 +518,7 @@ class CloudBigIP(BigIP):
 
         # Search pool members for nodes still in-use, if the node is still
         # being used, remove it from the node list
+        logger.debug("------------cleanup nodes function")
         for pool in pool_list:
             member_list = self.get_pool_member_list(partition, pool)
             for member in member_list:
@@ -552,13 +553,20 @@ class CloudBigIP(BigIP):
                                         partition=partition)
         node.delete()
 
-    def get_pool(self, partition, name):
+    def get_pool(self, partition, name, iappName=None):
         """Get a pool object.
 
         Args:
             partition: Partition name
             name: Pool name
         """
+        logger.debug("-------->>>>>>>>>>>>>-----pool name %s %s %s", name,partition,iappName)
+        p = self.ltm.pools.pool.load(
+            name=name,
+            partition=partition,
+            subPath=iappName+'.app'
+        )
+        return p
         # return pool object
 
         # FIXME(kenr): This is the efficient way to lookup a pool object:
@@ -577,15 +585,15 @@ class CloudBigIP(BigIP):
         # and then search the list for the matching pool name. However, we
         # will return the first pool found even though there are multiple
         # choices (if iapps are used).  See issue #138.
-        pools = self.ltm.pools.get_collection()
-        ret = None
-        for pool in pools:
-            if pool.partition == partition and pool.name == name:
-                ret = pool
-                logger.debug("-------->>>>>>>>>>>>>-----pool name %s", pool.name)
-        return ret
-        raise Exception("Failed to retrieve resource for pool {} "
-                        "in partition {}".format(name, partition))
+        #pools = self.ltm.pools.get_collection()
+        #ret = None
+        #for pool in pools:
+        #    if pool.partition == partition and pool.name == name:
+        #        ret = pool
+        #        logger.debug("-------->>>>>>>>>>>>>-----pool name %s", pool.name)
+        #return ret
+        #raise Exception("Failed to retrieve resource for pool {} "
+        #                "in partition {}".format(name, partition))
 
     def get_pool_list(self, partition, all_pools):
         """Get a list of pool names for a partition.
@@ -599,6 +607,7 @@ class CloudBigIP(BigIP):
         pools = self.ltm.pools.get_collection()
         for pool in pools:
             appService = getattr(pool, 'appService', None)
+            logger.debug("-------->>>>>>>>>>>>>-----value of appservice %s for pool %s", appService, pool.name)
             # pool must match partition and not belong to an appService
             if pool.partition == partition and \
                (appService is None or all_pools):
@@ -673,7 +682,7 @@ class CloudBigIP(BigIP):
                                      partition=partition)
         return m
 
-    def get_pool_member_list(self, partition, pool):
+    def get_pool_member_list(self, partition, pool, iappName=None):
         """Get a list of pool-member names.
 
         Args:
@@ -681,7 +690,7 @@ class CloudBigIP(BigIP):
             pool: Name of pool
         """
         member_list = []
-        logger.debug("in pool member list func %s", pool)
+        logger.debug("------------in pool member list func %s", pool)
         p = self.get_pool(partition, pool)
         members = p.members_s.get_collection()
         for member in members:
