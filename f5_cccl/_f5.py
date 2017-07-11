@@ -566,6 +566,7 @@ class CloudBigIP(BigIP):
             partition=partition,
             subPath=iappName+'.app'
         )
+        logger.debug("-------->>>>>>>>>>>>>-----pool name %v", p)
         return p
         # return pool object
 
@@ -692,10 +693,11 @@ class CloudBigIP(BigIP):
         member_list = []
         logger.debug("------------in pool member list func %s", pool)
         p = self.get_pool(partition, pool)
+        logger.debug("============================pool object %v", p)
         members = p.members_s.get_collection()
         for member in members:
             member_list.append(member.name)
-
+        logger.debug("============================memeber list for pool %s %v", pool, member_list)
         return member_list
 
     def member_create(self, partition, pool, member, data):
