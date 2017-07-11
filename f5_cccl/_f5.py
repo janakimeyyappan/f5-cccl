@@ -553,7 +553,7 @@ class CloudBigIP(BigIP):
                                         partition=partition)
         node.delete()
 
-    def get_pool(self, partition, name, iappName=None):
+    def get_pool(self, partition, name, iappName="default_my-frontend"):
         """Get a pool object.
 
         Args:
